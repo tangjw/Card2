@@ -13,8 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,8 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -52,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     }
     
     
-    //The Uri to store the big bitmap
     Uri imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));
     
     @Override
@@ -86,90 +81,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
     
-    /**
-     * 上传图片到名片全能王
-     *
-     * @param bitmap
-     */
-    private void uploadImg(Bitmap bitmap) {
-        byte[] bytes = bitmapToBytes(bitmap);
-        /*HttpUtils httpUtils = new HttpUtils();
-    
-        String url = "http://bcr2.intsig.net/BCRService/BCR_VCF2?user=tangjw@zonsim.com&pass=CQNTPGAP7FX3NXGF&lang=524287";
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("upfile", new File(file));
-        httpUtils.send(HttpRequest.HttpMethod.POST, url, params, new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                String result = responseInfo.result;
-                System.out.println(result);
-            }
-    
-            @Override
-            public void onFailure(HttpException e, String s) {
-        
-            }
-        });*/
-        String path = "http://bcr2.intsig.net/BCRService/BCR_VCF2?user=tangjw@zonsim.com&pass=CQNTPGAP7FX3NXGF&lang=524287";
-        try {
-            URL url = new URL(path);
-            HttpURLConnection uc = (HttpURLConnection) url.openConnection();
-            uc.setRequestMethod("POST");
-            //上传图片的一些参数设置  
-            uc.setRequestProperty("Accept", "image/gif,   image/x-xbitmap,   image/jpeg,   image/pjpeg,   application/vnd.ms-excel,   application/vnd.ms-powerpoint,   application/msword,   application/x-shockwave-flash,   application/x-quickviewplus,   */*");
-            uc.setRequestProperty("Accept-Language", "zh-cn");
-            uc.setRequestProperty("Content-type", "multipart/form-data;   boundary=---------------------------7d318fd100112");
-            uc.setRequestProperty("Accept-Encoding", "gzip,   deflate");
-            uc.setRequestProperty("User-Agent", "Mozilla/4.0   (compatible;   MSIE   6.0;   Windows   NT   5.1)");
-            uc.setRequestProperty("Connection", "Keep-Alive");
-            uc.setDoOutput(true);
-            uc.setUseCaches(false);
-            //读取文件流  
-            int size = (int) file.length();
-            byte[] data = new byte[size];
-            FileInputStream fis = new FileInputStream(file);
-            
-            fis.read(data, 0, size);
-            OutputStream os = uc.getOutputStream();
-            DataOutputStream dataOutputStream = new DataOutputStream(os);
-            dataOutputStream.write(data);
-
-//            os.write(data);
-            dataOutputStream.close();
-            
-            os.flush();
-            os.close();
-            fis.close();
-            
-            int code = uc.getResponseCode();
-            String result = "";
-            
-            if (200 == code) {
-                InputStream is = uc.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                while (bufferedReader.readLine() != null) {
-                    result = result + bufferedReader.readLine().trim();
-                }
-            }
-            System.out.println(result);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        
-    }
-    
-    public static byte[] bitmapToBytes(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        return baos.toByteArray();
-    }
-    
     private void openCamera() {
         Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // 下面这句指定调用相机拍照后的照片存储的路径
-//        File file = new File(Environment.getExternalStorageDirectory(), IMAGE_FILE_NAME);
         takeIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(takeIntent, REQUESTCODE_TAKE);
     }
@@ -212,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     
     private void uploadImg1(Bitmap bitmap) {
         
-        byte[] bytes = bitmapToBytes(bitmap);
         try {
             URL url = new URL(path);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -254,17 +166,12 @@ public class MainActivity extends AppCompatActivity {
             //取得Response内容 
             InputStream is = connection.getInputStream();
             int ch;
-//            StringBuffer b = new StringBuffer();
             File file = new File(Environment.getExternalStorageDirectory() + "/card.vcf");
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             while ((ch = is.read()) != -1) {
-//                b.append((char) ch);
                 fileOutputStream.write(ch);
             }
-            //将Response显示于Dialog
-//            System.out.println("返回:" + b.toString().trim());
-            
-            //关闭DataOutputStream
+
             fileOutputStream.close();
             ds.close();
             
